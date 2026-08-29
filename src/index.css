@@ -1,0 +1,274 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   ACCURATE SCALING — DESIGN TOKENS
+   "Frost Glass" — ice-pale ground, cobalt primary, glass-cyan accent.
+   ============================================================ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+
+  /* Ground. `ink` is the page canvas; `ink-2` is a faint frost tint used for
+     translucent/blurred panels (navbar, footer, sheets) so glass surfaces
+     read as tinted glass rather than flat white; `ink-3` is the brightest
+     surface, reserved for elevated accents (avatars, gradient highlights).
+     `void` is dark navy and used ONLY for modal/menu scrims — a dimming
+     overlay is conventionally dark regardless of the page's own theme. */
+  --color-void: #0b1420;
+  --color-ink: #eff4fa;
+  --color-ink-2: #e4ecf5;
+  --color-ink-3: #ffffff;
+
+  /* Brand ramp. Unlike a conventional 50=lightest/900=darkest scale, 100-300
+     are deliberately saturated and dark enough to read as text/icon/border
+     color against this light ground — that role needs contrast, not a pale
+     tint. 300 is the workhorse accent (glass-cyan); 500 is the primary
+     (cobalt), used as the CTA gradient's deep end and Calendly's brand color.
+     300 is verified at ~5:1 against both the page (as text) and --on-brand
+     (as a button fill hosting light text) — a brighter cyan reads fine as
+     small-scale UI decoration but fails one of those two roles. */
+  --color-brand-50: #eaf7fa;
+  --color-brand-100: #082e38;
+  --color-brand-200: #0a4d5c;
+  --color-brand-300: #0b7286;
+  --color-brand-400: #086f80;
+  --color-brand-500: #234e8c;
+  --color-brand-600: #1a3660;
+  --color-brand-700: #16315a;
+  --color-brand-800: #102444;
+  --color-brand-900: #0b1930;
+
+  /* Text on the light ground that a page in this theme has by default. */
+  --color-paper: #101826;
+  --color-muted: #45566b;
+  --color-faint: #52657a;
+
+  /* Dedicated light text for content sitting ON a brand-color fill (CTA
+   * buttons, the active language pill, chat bubbles) — brand-300..600 are all
+   * dark enough that body text can't sit on them; this is the one color that
+   * reliably can. Generates the `text-on-brand` utility. */
+  --color-on-brand: #f2fbfc;
+
+  --radius-4xl: 2rem;
+
+  --animate-aurora: aurora 22s ease-in-out infinite;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-pulse-ring: pulse-ring 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float: float 9s ease-in-out infinite;
+  --animate-ecg: ecg 4.5s linear infinite;
+}
+
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  33% {
+    transform: translate3d(6%, -4%, 0) scale(1.12);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate3d(-5%, 5%, 0) scale(0.94);
+    opacity: 0.45;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes ecg {
+  from {
+    stroke-dashoffset: 1400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* offset for the fixed navbar when jumping to #anchors */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* Arabic mode. Space Grotesk and Inter carry no Arabic glyphs, so instead
+   * of fighting utility specificity (.font-display always beats a base rule)
+   * we redefine the font VARIABLES. Every font-display / font-sans utility on
+   * the page then resolves to the Arabic face automatically.
+   * --font-mono is deliberately untouched, so Latin fragments (ClinicOS, JD,
+   * URLs) keep a Latin face. Driven by <html lang>, set by LanguageProvider. */
+  html[lang="ar"] {
+    --font-display: 'IBM Plex Sans Arabic', 'Space Grotesk', ui-sans-serif, sans-serif;
+    --font-sans: 'IBM Plex Sans Arabic', 'Inter', ui-sans-serif, sans-serif;
+  }
+
+  html[lang="ar"] h1,
+  html[lang="ar"] h2,
+  html[lang="ar"] h3,
+  html[lang="ar"] h4 {
+    letter-spacing: 0; /* Arabic script must never be letter-spaced */
+    line-height: 1.3;
+  }
+  ::selection {
+    background: var(--color-brand-500);
+    color: var(--color-on-brand);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink-2);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-brand-300);
+    border-radius: 99px;
+    border: 2px solid var(--color-ink-2);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-500);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+@utility font-arabic {
+  font-family: var(--font-arabic);
+}
+
+/* Bold numerals/initials — dark navy deepening into the cobalt/cyan accent.
+ * Needs to stay dark throughout since it sits on light cards; the old
+ * white-fading-up gradient only worked against a black ground. */
+@utility text-gradient {
+  background-image: linear-gradient(120deg, #101826 0%, #234e8c 55%, #0b7286 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility text-gradient-teal {
+  background-image: linear-gradient(100deg, #0b7286 0%, #234e8c 60%, #16315a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Frosted glass surface used by most cards */
+@utility glass {
+  background-color: color-mix(in oklab, var(--color-brand-300) 5%, white);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--color-brand-300) 16%, transparent);
+}
+
+@utility glass-strong {
+  background-color: color-mix(in oklab, var(--color-brand-300) 8%, rgba(255, 255, 255, 0.78));
+  backdrop-filter: blur(26px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--color-brand-300) 22%, transparent);
+}
+
+/* Faint technical grid */
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, rgba(35, 78, 140, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(35, 78, 140, 0.07) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
+}
+
+/* Shared section rhythm — tighter on mobile, opening up as the viewport grows,
+ * so small screens aren't paying the same 88px top/bottom tax as desktop. */
+@utility section {
+  padding-block: 3.5rem;
+}
+@media (min-width: 640px) {
+  .section {
+    padding-block: 4.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .section {
+    padding-block: 5.5rem;
+  }
+}
+@utility container-x {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
