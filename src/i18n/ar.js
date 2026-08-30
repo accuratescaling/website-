@@ -38,7 +38,7 @@ export default {
     bookCall: 'احجز مكالمة مجانية',
     bookCallShort: 'احجز مكالمة مجانية',
     bookFreeCall: 'احجز مكالمة مجانية',
-    requestQuote: 'اطلب عرض سعر',
+    requestQuote: 'احجز مكالمة مجانية',
     exploreProducts: 'تعرّف على منتجاتنا',
     exploreClinicOS: 'استكشف ClinicOS',
     seePackages: 'شاهد الباقات',

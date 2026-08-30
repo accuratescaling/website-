@@ -50,6 +50,13 @@
    * reliably can. Generates the `text-on-brand` utility. */
   --color-on-brand: #f2fbfc;
 
+  /* "Free" highlight inside CTA labels. Mint, so it reads as a distinct
+   * value cue against the teal→cobalt button fill rather than blending into
+   * it. Deliberately light: the button gradient is dark, and a saturated
+   * mid-green (green-400 and friends) drops under 4:1 on it. Generates
+   * `text-free`. */
+  --color-free: #a7f3d0;
+
   --radius-4xl: 2rem;
 
   --animate-aurora: aurora 22s ease-in-out infinite;
@@ -57,9 +64,6 @@
   --animate-pulse-ring: pulse-ring 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-float: float 9s ease-in-out infinite;
   --animate-ecg: ecg 4.5s linear infinite;
-  /* Specular sweep across the FREE tag. Long pause between passes so it
-   * catches the eye without becoming a flicker sitting next to the CTA. */
-  --animate-shine: shine 3.6s ease-in-out infinite;
 }
 
 @keyframes aurora {
@@ -109,16 +113,6 @@
   }
   50% {
     transform: translateY(-14px);
-  }
-}
-
-@keyframes shine {
-  0% {
-    transform: translateX(-130%);
-  }
-  55%,
-  100% {
-    transform: translateX(230%);
   }
 }
 

@@ -118,7 +118,8 @@ describe('pricing section', () => {
     const pricing = container.querySelector('#pricing')
     const buttons = [...pricing.querySelectorAll('button')]
     expect(buttons).toHaveLength(1)
-    expect(buttons[0].textContent).toMatch(/Book a Call/)
+    /* read the label from the dictionary — the wording is copy, not contract */
+    expect(buttons[0].textContent).toBe(en.ui.bookCallShort)
   })
 })
 
@@ -163,29 +164,39 @@ describe('footer', () => {
   })
 })
 
-describe('the FREE tag on booking CTAs', () => {
-  it('lifts the free-word out of the label into a tag, in both languages', () => {
-    for (const [lang, word, rest] of [
-      ['en', 'Free', 'Book a Call'],
-      ['ar', 'مجانية', 'احجز مكالمة'],
-    ]) {
-      const { container, unmount } = renderAt('/clinicos', lang)
-      const btn = [...container.querySelectorAll('button')].find((b) =>
-        b.querySelector('[data-free-tag]'),
-      )
+describe('the green "free" word in booking CTAs', () => {
+  it('tints the free-word inside the booking button, in both languages', () => {
+    /* Case-insensitive on purpose: the label's casing is copy the client
+     * edits freely ("Free" / "free"), and the highlight follows either. */
+    const FREE = /^(?:free|مجانية|مجاناً|مجانا|مجاني)$/i
 
-      expect(btn, lang).toBeTruthy()
-      expect(btn.querySelector('[data-free-tag]').textContent.trim(), lang).toBe(word)
-      /* the word is not left behind in the sentence as well */
-      expect(btn.textContent.replace(word, '').trim(), lang).toBe(rest)
+    for (const lang of ['en', 'ar']) {
+      const { container, unmount } = renderAt('/clinicos', lang)
+      const tinted = [...container.querySelectorAll('button [data-free-word]')]
+
+      expect(tinted.length, lang).toBeGreaterThan(0)
+      for (const el of tinted) {
+        expect(el.textContent.trim(), lang).toMatch(FREE)
+        expect(el.className, lang).toContain('text-free')
+      }
       unmount()
     }
   })
 
-  it('tags EVERY booking button on the page, not just the first', () => {
-    /* Guards the classic /g-regex trap: a stateful matcher would tag only
-     * alternating buttons. Arabic is the strict case — every booking label
-     * there contains مجانية. */
+  it('keeps the word in place in the sentence, not lifted out of it', () => {
+    const { container } = renderAt('/clinicos', 'en')
+    const btn = [...container.querySelectorAll('button')].find(
+      (b) => b.textContent === en.ui.bookFreeCall,
+    )
+    /* the full label still reads as one sentence, tinting and all */
+    expect(btn, en.ui.bookFreeCall).toBeTruthy()
+    expect(btn.querySelector('[data-free-word]')).toBeTruthy()
+  })
+
+  it('tints EVERY booking button on the page, not just the first', () => {
+    /* Guards the classic /g-regex trap: a stateful `.test()` would tint the
+     * word on alternating buttons only. Arabic is the strict case — every
+     * booking label there contains مجانية. */
     const { container } = renderAt('/clinicos', 'ar')
     const booking = [...container.querySelectorAll('button')].filter((b) =>
       b.textContent.includes('مجانية'),
@@ -193,16 +204,16 @@ describe('the FREE tag on booking CTAs', () => {
 
     expect(booking.length).toBeGreaterThan(1)
     for (const b of booking) {
-      expect(b.querySelector('[data-free-tag]'), b.textContent.trim()).toBeTruthy()
+      expect(b.querySelector('[data-free-word]'), b.textContent.trim()).toBeTruthy()
     }
   })
 
-  it('leaves a label with no free-word untagged', () => {
+  it('leaves a label with no free-word untouched', () => {
     const { container } = renderAt('/clinicos', 'en')
     const quote = [...container.querySelectorAll('button')].find((b) =>
       /Request a quote/.test(b.textContent),
     )
-    if (quote) expect(quote.querySelector('[data-free-tag]')).toBeNull()
+    if (quote) expect(quote.querySelector('[data-free-word]')).toBeNull()
   })
 })
 

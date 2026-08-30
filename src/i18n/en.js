@@ -35,9 +35,9 @@ export default {
 
   ui: {
     bookCall: 'Book a Free Call',
-    bookCallShort: 'Book a Call',
+    bookCallShort: 'Book a free Call',
     bookFreeCall: 'Book a Free Call',
-    requestQuote: 'Request a quote',
+    requestQuote: 'Book a Free Call',
     exploreProducts: 'Explore our products',
     exploreClinicOS: 'Explore ClinicOS',
     seePackages: 'See the packages',
