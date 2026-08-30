@@ -163,6 +163,49 @@ describe('footer', () => {
   })
 })
 
+describe('the FREE tag on booking CTAs', () => {
+  it('lifts the free-word out of the label into a tag, in both languages', () => {
+    for (const [lang, word, rest] of [
+      ['en', 'Free', 'Book a Call'],
+      ['ar', 'مجانية', 'احجز مكالمة'],
+    ]) {
+      const { container, unmount } = renderAt('/clinicos', lang)
+      const btn = [...container.querySelectorAll('button')].find((b) =>
+        b.querySelector('[data-free-tag]'),
+      )
+
+      expect(btn, lang).toBeTruthy()
+      expect(btn.querySelector('[data-free-tag]').textContent.trim(), lang).toBe(word)
+      /* the word is not left behind in the sentence as well */
+      expect(btn.textContent.replace(word, '').trim(), lang).toBe(rest)
+      unmount()
+    }
+  })
+
+  it('tags EVERY booking button on the page, not just the first', () => {
+    /* Guards the classic /g-regex trap: a stateful matcher would tag only
+     * alternating buttons. Arabic is the strict case — every booking label
+     * there contains مجانية. */
+    const { container } = renderAt('/clinicos', 'ar')
+    const booking = [...container.querySelectorAll('button')].filter((b) =>
+      b.textContent.includes('مجانية'),
+    )
+
+    expect(booking.length).toBeGreaterThan(1)
+    for (const b of booking) {
+      expect(b.querySelector('[data-free-tag]'), b.textContent.trim()).toBeTruthy()
+    }
+  })
+
+  it('leaves a label with no free-word untagged', () => {
+    const { container } = renderAt('/clinicos', 'en')
+    const quote = [...container.querySelectorAll('button')].find((b) =>
+      /Request a quote/.test(b.textContent),
+    )
+    if (quote) expect(quote.querySelector('[data-free-tag]')).toBeNull()
+  })
+})
+
 describe('cross-page hash routing', () => {
   /* Landing on /#about (or /clinicos#packages) must scroll to that section.
    * The browser cannot do this on its own here: the target section belongs to

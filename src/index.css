@@ -57,6 +57,9 @@
   --animate-pulse-ring: pulse-ring 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-float: float 9s ease-in-out infinite;
   --animate-ecg: ecg 4.5s linear infinite;
+  /* Specular sweep across the FREE tag. Long pause between passes so it
+   * catches the eye without becoming a flicker sitting next to the CTA. */
+  --animate-shine: shine 3.6s ease-in-out infinite;
 }
 
 @keyframes aurora {
@@ -106,6 +109,16 @@
   }
   50% {
     transform: translateY(-14px);
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-130%);
+  }
+  55%,
+  100% {
+    transform: translateX(230%);
   }
 }
 

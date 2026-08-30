@@ -35,8 +35,8 @@ export default {
   ],
 
   ui: {
-    bookCall: 'احجز مكالمة تعريفية',
-    bookCallShort: 'احجز مكالمة',
+    bookCall: 'احجز مكالمة مجانية',
+    bookCallShort: 'احجز مكالمة مجانية',
     bookFreeCall: 'احجز مكالمة مجانية',
     requestQuote: 'اطلب عرض سعر',
     exploreProducts: 'تعرّف على منتجاتنا',
@@ -474,7 +474,7 @@ export default {
     soon: 'قريباً',
     product2: 'المنتج الثاني',
     product3: 'المنتج الثالث',
-    rights: 'من بناء علاء ومحمد وفيصل.',
+    rights: 'جميع الحقوق محفوظة.',
   },
 
   /* ---------------------------------------------------------------- CALENDLY */

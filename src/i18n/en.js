@@ -34,7 +34,7 @@ export default {
   ],
 
   ui: {
-    bookCall: 'Book a Discovery Call',
+    bookCall: 'Book a Free Call',
     bookCallShort: 'Book a Call',
     bookFreeCall: 'Book a Free Call',
     requestQuote: 'Request a quote',
@@ -497,7 +497,7 @@ export default {
     soon: 'SOON',
     product2: 'Product 02',
     product3: 'Product 03',
-    rights: 'Built by Alaa, Mohammed and Faisal.',
+    rights: 'All rights reserved.',
   },
 
   /* ---------------------------------------------------------------- CALENDLY */
