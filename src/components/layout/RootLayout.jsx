@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion'
 import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from '../Navbar'
@@ -100,6 +100,31 @@ export default function RootLayout() {
   const { pathname } = useLocation()
   const { t } = useLang()
 
+  /* ------------------------------------------------------------------------
+   *  Why this ref exists, and why `initial={false}` is NOT on <AnimatePresence>
+   *
+   *  The page-transition fade should not play on the very first load — you
+   *  should not watch the landing page fade in from nothing. The obvious way
+   *  to express that is <AnimatePresence initial={false}>, and that is what
+   *  this file used to do. It has a severe side effect:
+   *
+   *  AnimatePresence passes `initial: false` down through PresenceContext, and
+   *  EVERY descendant motion component reads it — not just its direct child.
+   *  So on first load every <Reveal> on the page rendered straight at its
+   *  final state with no `initial="hidden"` applied at all, leaving nothing to
+   *  fade in from. The scroll-reveal animations were dead on whichever page
+   *  was loaded first, while any page reached by clicking a link animated
+   *  normally (a second presence child is not the "initial" one).
+   *
+   *  Putting `initial={false}` on the <motion.main> itself gets the same
+   *  result for the page transition without touching PresenceContext, so the
+   *  reveals below keep their own initial states.
+   * ----------------------------------------------------------------------*/
+  const firstRender = useRef(true)
+  useEffect(() => {
+    firstRender.current = false
+  }, [])
+
   return (
     <>
       <ScrollProgress />
@@ -108,10 +133,10 @@ export default function RootLayout() {
       <LanguageFade>
         {/* mode="wait" so the outgoing page finishes before the next arrives —
           * two full pages crossfading on top of each other reads as a glitch. */}
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait">
           <motion.main
             key={pathname}
-            initial={{ opacity: 0, y: 14 }}
+            initial={firstRender.current ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10, pointerEvents: 'none' }}
             transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}

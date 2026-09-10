@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 
@@ -221,5 +221,57 @@ describe('language switching', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe('scroll-reveal animations on the first page loaded', () => {
+  /* An IntersectionObserver that never reports intersection, so `whileInView`
+   * cannot fire and whatever style remains is purely the `initial` state. */
+  class SilentIO {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return []
+    }
+  }
+
+  let realIO
+  beforeEach(() => {
+    realIO = globalThis.IntersectionObserver
+    globalThis.IntersectionObserver = SilentIO
+  })
+  afterEach(() => {
+    globalThis.IntersectionObserver = realIO
+  })
+
+  it('keeps the reveals hidden until they scroll into view, on first load', () => {
+    /* REGRESSION: <AnimatePresence initial={false}> passes `initial: false`
+     * down through PresenceContext to EVERY descendant motion component, not
+     * just its direct child. That made every <Reveal> render straight at its
+     * final state on the first page loaded — nothing to fade in from, so the
+     * scroll animations were dead there while any page reached by clicking a
+     * link animated normally. */
+    const { container } = renderApp('/')
+
+    /* <Reveal> renders a motion.div WRAPPING its children, so the section
+     * heading's parent is the element Framer Motion actually animates. */
+    for (const id of ['services', 'about', 'products']) {
+      const heading = container.querySelector(`#${id} h2`)
+      expect(heading, `#${id} h2`).toBeTruthy()
+      const wrapper = heading.parentElement
+      expect(
+        wrapper.getAttribute('style') || '',
+        `#${id}: the reveal wrapper has no hidden initial state, so it can never fade in`,
+      ).toMatch(/opacity:\s*0/)
+    }
+  })
+
+  it('does not play the page transition on the very first load', () => {
+    const { container } = renderApp('/')
+    const main = container.querySelector('main')
+    /* the routed <main> itself starts settled, so the landing page does not
+     * fade in from nothing */
+    expect(main.getAttribute('style') || '').not.toMatch(/opacity:\s*0/)
   })
 })
